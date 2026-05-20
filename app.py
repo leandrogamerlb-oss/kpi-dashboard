@@ -331,9 +331,9 @@ with chart_col2:
             fillcolor="rgba(0,194,168,0.07)",
             hovertemplate="<b>%{x}</b><br>%{y} %<extra></extra>",
         ))
-        fig2.update_layout(**PLOT_LAYOUT, height=280,
-                           yaxis=dict(range=[0, 100], gridcolor="rgba(255,255,255,0.05)",
-                                      linecolor="rgba(0,0,0,0)", tickcolor="rgba(0,0,0,0)"))
+        fig2.update_layout(**PLOT_LAYOUT, height=280)
+        fig2.update_yaxes(range=[0, 100], gridcolor="rgba(255,255,255,0.05)",
+                          linecolor="rgba(0,0,0,0)", tickcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig2, use_container_width=True)
     else:
         st.info("Sem dados de energia renovável.")
