@@ -345,7 +345,8 @@ st.divider()
 st.markdown('<div class="section-header">All KPIs · ' + latest_report + '</div>', unsafe_allow_html=True)
 st.markdown(" ")
 
-kpi_rows = df_latest.to_dict("records")
+HERO_KPIS = {"consumo_total", "perc_energia_renovavel"}
+kpi_rows = df_latest[~df_latest["kpi_name"].isin(HERO_KPIS)].to_dict("records")
 if kpi_rows:
     cols = st.columns(min(len(kpi_rows), 4))
     for i, row in enumerate(kpi_rows):
