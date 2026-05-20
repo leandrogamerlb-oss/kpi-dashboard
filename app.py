@@ -341,28 +341,6 @@ with chart_col2:
 st.divider()
 
 
-# ── SECONDARY METRIC CARDS (all KPIs for latest report) ───────────────────────
-st.markdown('<div class="section-header">All KPIs · ' + latest_report + '</div>', unsafe_allow_html=True)
-st.markdown(" ")
-
-HERO_KPIS = {"consumo_total", "perc_energia_renovavel"}
-kpi_rows = df_latest[~df_latest["kpi_name"].isin(HERO_KPIS)].to_dict("records")
-if kpi_rows:
-    cols = st.columns(min(len(kpi_rows), 4))
-    for i, row in enumerate(kpi_rows):
-        with cols[i % len(cols)]:
-            name = row.get("kpi_name", "").replace("_", " ").title()
-            val  = row.get("value", "—")
-            unit = row.get("unit", "")
-            st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-card-label">{name}</div>
-                <div class="metric-card-value">{val}<span class="metric-card-unit">{unit}</span></div>
-                <div class="metric-card-badge">{latest_report}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-st.divider()
 
 
 # ── RAW DOCUMENTS ──────────────────────────────────────────────────────────────
