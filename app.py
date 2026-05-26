@@ -383,11 +383,11 @@ CLICK_ICON = """<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" v
   fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M14 2l-2 6h6l-5 8 2-6H9l5-8z"/></svg>"""
 
-chart_col1, chart_col2, chart_col3 = st.columns(3)
-
 HOVER = dict(bgcolor="#111827", font_color="#ffffff", bordercolor="#111827")
 
-# ── Bar chart ─────────────────────────────────────────────────────────────────
+# ── Row 1: Bar + Line ─────────────────────────────────────────────────────────
+chart_col1, chart_col2 = st.columns(2)
+
 with chart_col1:
     st.markdown('<div class="chart-title">Consumo Total por Relatório</div>', unsafe_allow_html=True)
     st.markdown(f'<div class="chart-hint">{CLICK_ICON} Clica numa barra para ver detalhes</div>', unsafe_allow_html=True)
@@ -408,7 +408,6 @@ with chart_col1:
     fig_bar.update_layout(**PLOT_LAYOUT, height=280, hoverlabel=HOVER)
     bar_sel = st.plotly_chart(fig_bar, use_container_width=True, on_select="rerun", key="bar_chart")
 
-# ── Line chart ────────────────────────────────────────────────────────────────
 with chart_col2:
     st.markdown('<div class="chart-title">Energia Renovável % por Relatório</div>', unsafe_allow_html=True)
     st.markdown(f'<div class="chart-hint">{CLICK_ICON} Clica num ponto para ver detalhes</div>', unsafe_allow_html=True)
@@ -429,13 +428,15 @@ with chart_col2:
                           gridcolor="#f3f4f6", linecolor="rgba(0,0,0,0)", tickcolor="rgba(0,0,0,0)")
     line_sel = st.plotly_chart(fig_line, use_container_width=True, on_select="rerun", key="line_chart")
 
-# ── Pie chart (latest report: renovável vs não-renovável) ─────────────────────
-with chart_col3:
-    st.markdown('<div class="chart-title">Renováveis vs Não Renováveis</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="chart-hint">{CLICK_ICON} Clica numa fatia para ver detalhes</div>', unsafe_allow_html=True)
+# ── Row 2: Pie centred ────────────────────────────────────────────────────────
+renov_pct = renovavel_val if renovavel_val is not None else 0
+non_renov_pct = round(100 - renov_pct, 1)
 
-    renov_pct = renovavel_val if renovavel_val is not None else 0
-    non_renov_pct = round(100 - renov_pct, 1)
+pie_left, pie_center, pie_right = st.columns([1, 2, 1])
+
+with pie_center:
+    st.markdown('<div class="chart-title" style="text-align:center">Renováveis vs Não Renováveis</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="chart-hint" style="justify-content:center">{CLICK_ICON} Clica numa fatia para ver detalhes</div>', unsafe_allow_html=True)
 
     fig_pie = go.Figure()
     fig_pie.add_trace(go.Pie(
@@ -455,7 +456,7 @@ with chart_col3:
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(family="Syne, sans-serif", color="#9ca3af", size=11),
         margin=dict(l=10, r=10, t=10, b=10),
-        height=280,
+        height=320,
         hoverlabel=HOVER,
         showlegend=True,
         legend=dict(
