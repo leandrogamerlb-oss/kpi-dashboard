@@ -4,4 +4,3 @@ pymongo>=4.8.0
 plotly>=5.22.0
 python-dotenv>=1.0.1
 dnspython>=2.6.1
-streamlit-plotly-events>=0.0.6
