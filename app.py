@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 from datetime import datetime
 import os
 from dotenv import load_dotenv
-from streamlit_plotly_events import plotly_events
+
 
 load_dotenv()
 
@@ -383,15 +383,14 @@ CLICK_ICON = """<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" v
   fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M14 2l-2 6h6l-5 8 2-6H9l5-8z"/></svg>"""
 
-chart_col1, chart_col2 = st.columns(2)
+chart_col1, chart_col2, chart_col3 = st.columns(3)
+
+HOVER = dict(bgcolor="#111827", font_color="#ffffff", bordercolor="#111827")
 
 # ── Bar chart ─────────────────────────────────────────────────────────────────
 with chart_col1:
     st.markdown('<div class="chart-title">Consumo Total por Relatório</div>', unsafe_allow_html=True)
-    st.markdown(
-        f'<div class="chart-hint">{CLICK_ICON} Clica numa barra para ver os dados do mês</div>',
-        unsafe_allow_html=True
-    )
+    st.markdown(f'<div class="chart-hint">{CLICK_ICON} Clica numa barra para ver detalhes</div>', unsafe_allow_html=True)
 
     fig_bar = go.Figure()
     fig_bar.add_trace(go.Bar(
@@ -406,17 +405,13 @@ with chart_col1:
         ),
         hovertemplate="<b>%{x}</b><br>%{y:,} kWh<extra></extra>",
     ))
-    fig_bar.update_layout(**PLOT_LAYOUT, height=280,
-                          hoverlabel=dict(bgcolor="#111827", font_color="#ffffff", bordercolor="#111827"))
-    bar_click = plotly_events(fig_bar, click_event=True, hover_event=False, key="bar_click")
+    fig_bar.update_layout(**PLOT_LAYOUT, height=280, hoverlabel=HOVER)
+    bar_sel = st.plotly_chart(fig_bar, use_container_width=True, on_select="rerun", key="bar_chart")
 
 # ── Line chart ────────────────────────────────────────────────────────────────
 with chart_col2:
     st.markdown('<div class="chart-title">Energia Renovável % por Relatório</div>', unsafe_allow_html=True)
-    st.markdown(
-        f'<div class="chart-hint">{CLICK_ICON} Clica num ponto para ver os dados do mês</div>',
-        unsafe_allow_html=True
-    )
+    st.markdown(f'<div class="chart-hint">{CLICK_ICON} Clica num ponto para ver detalhes</div>', unsafe_allow_html=True)
 
     fig_line = go.Figure()
     fig_line.add_trace(go.Scatter(
@@ -429,11 +424,54 @@ with chart_col2:
         fillcolor="rgba(22,163,74,0.08)",
         hovertemplate="<b>%{x}</b><br>%{y:.1f}%<extra></extra>",
     ))
-    fig_line.update_layout(**PLOT_LAYOUT, height=280,
-                           hoverlabel=dict(bgcolor="#111827", font_color="#ffffff", bordercolor="#111827"))
+    fig_line.update_layout(**PLOT_LAYOUT, height=280, hoverlabel=HOVER)
     fig_line.update_yaxes(range=[0, 100], ticksuffix="%",
                           gridcolor="#f3f4f6", linecolor="rgba(0,0,0,0)", tickcolor="rgba(0,0,0,0)")
-    line_click = plotly_events(fig_line, click_event=True, hover_event=False, key="line_click")
+    line_sel = st.plotly_chart(fig_line, use_container_width=True, on_select="rerun", key="line_chart")
+
+# ── Pie chart (latest report: renovável vs não-renovável) ─────────────────────
+with chart_col3:
+    st.markdown('<div class="chart-title">Renováveis vs Não Renováveis</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="chart-hint">{CLICK_ICON} Clica numa fatia para ver detalhes</div>', unsafe_allow_html=True)
+
+    renov_pct = renovavel_val if renovavel_val is not None else 0
+    non_renov_pct = round(100 - renov_pct, 1)
+
+    fig_pie = go.Figure()
+    fig_pie.add_trace(go.Pie(
+        labels=[f"Renovável", f"Não Renovável"],
+        values=[renov_pct, non_renov_pct],
+        hole=0.55,
+        marker=dict(
+            colors=["#16a34a", "#fde68a"],
+            line=dict(color="#ffffff", width=2),
+        ),
+        textfont=dict(family="Syne, sans-serif", size=11, color="#374151"),
+        hovertemplate="<b>%{label}</b><br>%{value:.1f}%<extra></extra>",
+        sort=False,
+    ))
+    fig_pie.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Syne, sans-serif", color="#9ca3af", size=11),
+        margin=dict(l=10, r=10, t=10, b=10),
+        height=280,
+        hoverlabel=HOVER,
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom", y=-0.18,
+            xanchor="center", x=0.5,
+            font=dict(size=10, color="#6b7280"),
+        ),
+        annotations=[dict(
+            text=f"<b>{renov_pct}%</b><br><span style='font-size:10px'>renovável</span>",
+            x=0.5, y=0.5, showarrow=False,
+            font=dict(size=13, color="#111827", family="Syne, sans-serif"),
+            align="center",
+        )],
+    )
+    pie_sel = st.plotly_chart(fig_pie, use_container_width=True, on_select="rerun", key="pie_chart")
 
 
 # ── DETAIL PANEL ─────────────────────────────────────────────────────────────
@@ -468,13 +506,13 @@ def render_detail(clicked_label: str, source: str):
     pill = f'<span class="detail-month-pill">{ICON_CALENDAR} {clicked_label}</span>'
 
     chips = ""
-    if source in ("bar", "line") and consumo is not None:
+    if source in ("bar", "line", "pie") and consumo is not None:
         chips += f"""
         <div class="kpi-chip kpi-chip-amber">
             <div class="kpi-chip-label kpi-chip-label-amber">{ICON_ZAP_SM} Consumo Total</div>
             <span class="kpi-chip-value">{consumo:,}</span><span class="kpi-chip-unit">{c_unit}</span>
         </div>"""
-    if source == "line" and renovavel is not None:
+    if source in ("line", "pie") and renovavel is not None:
         chips += f"""
         <div class="kpi-chip kpi-chip-green">
             <div class="kpi-chip-label kpi-chip-label-green">{ICON_LEAF_SM} Energia Renovável</div>
@@ -507,23 +545,33 @@ def render_detail(clicked_label: str, source: str):
             st.dataframe(df_report.reset_index(drop=True), use_container_width=True, hide_index=True)
 
 
-# Determine which chart was clicked (bar takes priority if both somehow fire)
+# ── Detect click from any chart ──────────────────────────────────────────────
 clicked_label = None
 click_source  = None
 
-if bar_click:
-    try:
-        clicked_label = bar_click[0]["x"]
+try:
+    pts = bar_sel.selection.get("points", [])
+    if pts:
+        clicked_label = pts[0].get("x")
         click_source  = "bar"
-    except Exception:
-        pass
+except Exception:
+    pass
 
-if line_click and not clicked_label:
-    try:
-        clicked_label = line_click[0]["x"]
+try:
+    pts = line_sel.selection.get("points", [])
+    if pts and not clicked_label:
+        clicked_label = pts[0].get("x")
         click_source  = "line"
-    except Exception:
-        pass
+except Exception:
+    pass
+
+try:
+    pts = pie_sel.selection.get("points", [])
+    if pts and not clicked_label:
+        clicked_label = latest_label   # pie always refers to latest report
+        click_source  = "pie"
+except Exception:
+    pass
 
 if clicked_label:
     st.divider()
