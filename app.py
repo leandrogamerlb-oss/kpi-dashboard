@@ -74,50 +74,54 @@ section[data-testid="stSidebar"] {
     background: linear-gradient(90deg, transparent, rgba(91,140,255,0.15), transparent);
 }
 .kpi-hero-label {
-    font-size: 0.68rem;
+    font-size: 0.62rem;
     font-weight: 700;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: #5B8CFF;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
     gap: 6px;
 }
-.kpi-hero-value {
-    font-size: 3rem;
+/* Month — top, prominent */
+.kpi-hero-month {
+    font-size: 1.55rem;
     font-weight: 800;
     color: #ffffff;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    margin-bottom: 6px;
+}
+.kpi-hero-year {
+    font-size: 1.55rem;
+    font-weight: 400;
+    color: #5B8CFF;
+    margin-left: 8px;
+    letter-spacing: -0.01em;
+}
+/* Divider between month and value */
+.kpi-hero-divider {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(91,140,255,0.25), transparent);
+    margin: 14px 0;
+}
+/* Value — bottom, secondary */
+.kpi-hero-value {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: #a8c4ff;
     line-height: 1;
-    margin-bottom: 4px;
     font-family: 'JetBrains Mono', monospace;
     letter-spacing: -0.03em;
 }
 .kpi-hero-unit {
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 400;
-    color: #4A6080;
-    margin-left: 8px;
+    color: #3d5a80;
+    margin-left: 6px;
     font-family: 'Syne', sans-serif;
     letter-spacing: 0;
-}
-.kpi-hero-month {
-    font-size: 0.8rem;
-    color: #2a4a70;
-    margin-top: 14px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-.kpi-hero-month::before {
-    content: '';
-    display: inline-block;
-    width: 16px;
-    height: 1px;
-    background: #2a4a70;
 }
 
 /* ── METRIC CARD ── */
@@ -364,21 +368,30 @@ col_a, col_b, col_spacer = st.columns([1, 1, 1])
 
 with col_a:
     if consumo is not None:
+        # Split "Junho 2026" → month + year for styled rendering
+        parts = latest_label.split(" ", 1)
+        month_str = parts[0]
+        year_str = parts[1] if len(parts) > 1 else ""
         st.markdown(f"""
         <div class="kpi-hero">
             <div class="kpi-hero-label">⚡ Consumo Total</div>
+            <div class="kpi-hero-month">{month_str}<span class="kpi-hero-year">{year_str}</span></div>
+            <div class="kpi-hero-divider"></div>
             <div class="kpi-hero-value">{consumo:,}<span class="kpi-hero-unit">{consumo_unit}</span></div>
-            <div class="kpi-hero-month">{latest_label}</div>
         </div>
         """, unsafe_allow_html=True)
 
 with col_b:
     if renovavel is not None:
+        parts = latest_label.split(" ", 1)
+        month_str = parts[0]
+        year_str = parts[1] if len(parts) > 1 else ""
         st.markdown(f"""
         <div class="kpi-hero">
             <div class="kpi-hero-label">🌱 Energia Renovável</div>
+            <div class="kpi-hero-month">{month_str}<span class="kpi-hero-year">{year_str}</span></div>
+            <div class="kpi-hero-divider"></div>
             <div class="kpi-hero-value">{renovavel}<span class="kpi-hero-unit">{renov_unit}</span></div>
-            <div class="kpi-hero-month">{latest_label}</div>
         </div>
         """, unsafe_allow_html=True)
 
