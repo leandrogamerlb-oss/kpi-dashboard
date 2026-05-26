@@ -10,20 +10,64 @@ load_dotenv()
 
 st.set_page_config(
     page_title="Energy Analytics",
-    page_icon="⚡",
+    page_icon="https://api.iconify.design/lucide/zap.svg",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# ── SVG ICONS (Lucide-style, inline) ──────────────────────────────────────────
+ICON_ZAP = """<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+  fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+</svg>"""
+
+ICON_LEAF = """<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+  fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+  <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+</svg>"""
+
+ICON_REPORT = """<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+  fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+  <polyline points="14 2 14 8 20 8"/>
+  <line x1="16" y1="13" x2="8" y2="13"/>
+  <line x1="16" y1="17" x2="8" y2="17"/>
+  <polyline points="10 9 9 9 8 9"/>
+</svg>"""
+
+ICON_REFRESH = """<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+  fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="23 4 23 10 17 10"/>
+  <polyline points="1 20 1 14 7 14"/>
+  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+</svg>"""
+
+ICON_BOLT_SIDEBAR = """<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+  fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+</svg>"""
+
+ICON_FILE = """<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+  <polyline points="13 2 13 9 20 9"/>
+</svg>"""
+
+ICON_TABLE = """<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+  <line x1="3" y1="9" x2="21" y2="9"/>
+  <line x1="3" y1="15" x2="21" y2="15"/>
+  <line x1="9" y1="3" x2="9" y2="21"/>
+</svg>"""
 
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-html, body, [class*="css"] {
-    font-family: 'Syne', sans-serif;
-}
+html, body, [class*="css"] { font-family: 'Syne', sans-serif; }
 
-/* ── BACKGROUND ── */
 .main { background-color: #f4f6f9; }
 
 section[data-testid="stSidebar"] {
@@ -67,6 +111,7 @@ section[data-testid="stSidebar"] strong { color: #ffffff !important; }
     text-transform: uppercase;
     margin-bottom: 28px;
 }
+.badge-report svg { vertical-align: middle; }
 
 /* ── KPI HERO — CONSUMO (amber) ── */
 .kpi-hero-consumo {
@@ -107,12 +152,33 @@ section[data-testid="stSidebar"] strong { color: #ffffff !important; }
 }
 
 /* ── SHARED CARD INTERNALS ── */
+.kpi-icon-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+.kpi-icon-wrap-consumo {
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    background: rgba(251,192,45,0.18);
+    border-radius: 8px;
+    color: #b45309;
+    flex-shrink: 0;
+}
+.kpi-icon-wrap-renov {
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    background: rgba(52,168,83,0.14);
+    border-radius: 8px;
+    color: #166534;
+    flex-shrink: 0;
+}
 .kpi-hero-kpi-name {
     font-size: 1.1rem;
     font-weight: 800;
     letter-spacing: 0.01em;
     text-transform: uppercase;
-    margin-bottom: 14px;
 }
 .kpi-hero-kpi-name-consumo { color: #b45309; }
 .kpi-hero-kpi-name-renov   { color: #166534; }
@@ -125,25 +191,19 @@ section[data-testid="stSidebar"] strong { color: #ffffff !important; }
     line-height: 1.1;
     margin-bottom: 4px;
 }
-.kpi-hero-year {
-    font-size: 1.7rem;
-    font-weight: 400;
-    margin-left: 10px;
-}
+.kpi-hero-year { font-size: 1.7rem; font-weight: 400; margin-left: 10px; }
 .kpi-hero-year-consumo { color: #d97706; }
 .kpi-hero-year-renov   { color: #16a34a; }
 
 .kpi-hero-divider-consumo {
     height: 2px;
     background: linear-gradient(90deg, #fbc02d, transparent);
-    margin: 16px 0;
-    border-radius: 2px;
+    margin: 16px 0; border-radius: 2px;
 }
 .kpi-hero-divider-renov {
     height: 2px;
     background: linear-gradient(90deg, #34a853, transparent);
-    margin: 16px 0;
-    border-radius: 2px;
+    margin: 16px 0; border-radius: 2px;
 }
 
 .kpi-hero-value {
@@ -155,8 +215,7 @@ section[data-testid="stSidebar"] strong { color: #ffffff !important; }
     color: #111827;
 }
 .kpi-hero-unit {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 1rem; font-weight: 500;
     margin-left: 6px;
     font-family: 'Syne', sans-serif;
     letter-spacing: 0;
@@ -178,10 +237,7 @@ section[data-testid="stSidebar"] strong { color: #ffffff !important; }
     gap: 10px;
 }
 .section-header::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: #e5e7eb;
+    content: ''; flex: 1; height: 1px; background: #e5e7eb;
 }
 
 /* ── CHART TITLE ── */
@@ -194,9 +250,19 @@ section[data-testid="stSidebar"] strong { color: #ffffff !important; }
     margin-bottom: 4px;
 }
 
+/* ── SIDEBAR BRAND ── */
+.sidebar-brand {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 4px;
+}
+.sidebar-brand-text {
+    font-size: 1rem; font-weight: 800;
+    color: #ffffff !important;
+    letter-spacing: -0.01em;
+}
+
 hr { border-color: #e5e7eb !important; }
 
-/* Streamlit expander light theme */
 [data-testid="stExpander"] {
     background: #ffffff;
     border: 1px solid #e5e7eb !important;
@@ -215,7 +281,6 @@ def get_client():
         st.stop()
     return pymongo.MongoClient(uri)
 
-
 @st.cache_data(ttl=60)
 def load_kpi_data():
     client = get_client()
@@ -225,7 +290,6 @@ def load_kpi_data():
         df["created_at"] = pd.to_datetime(df["created_at"], errors="coerce")
     return df
 
-
 @st.cache_data(ttl=60)
 def load_raw_data():
     client = get_client()
@@ -234,7 +298,6 @@ def load_raw_data():
     if not df.empty and "recorded_at" in df.columns:
         df["recorded_at"] = pd.to_datetime(df["recorded_at"], errors="coerce")
     return df
-
 
 @st.cache_data(ttl=60)
 def load_company():
@@ -249,18 +312,10 @@ PLOT_LAYOUT = dict(
     plot_bgcolor="rgba(0,0,0,0)",
     font=dict(family="Syne, sans-serif", color="#9ca3af", size=11),
     margin=dict(l=10, r=10, t=16, b=10),
-    xaxis=dict(
-        showgrid=False,
-        linecolor="#e5e7eb",
-        tickcolor="rgba(0,0,0,0)",
-        tickfont=dict(size=10, color="#6b7280"),
-    ),
-    yaxis=dict(
-        gridcolor="#f3f4f6",
-        linecolor="rgba(0,0,0,0)",
-        tickcolor="rgba(0,0,0,0)",
-        tickfont=dict(size=10, color="#6b7280"),
-    ),
+    xaxis=dict(showgrid=False, linecolor="#e5e7eb",
+               tickcolor="rgba(0,0,0,0)", tickfont=dict(size=10, color="#6b7280")),
+    yaxis=dict(gridcolor="#f3f4f6", linecolor="rgba(0,0,0,0)",
+               tickcolor="rgba(0,0,0,0)", tickfont=dict(size=10, color="#6b7280")),
     showlegend=False,
 )
 
@@ -292,12 +347,16 @@ def sort_reports(reports):
 company = load_company()
 
 with st.sidebar:
-    st.markdown("### ⚡ Energy Analytics")
+    st.markdown(
+        f'<div class="sidebar-brand">{ICON_BOLT_SIDEBAR}'
+        f'<span class="sidebar-brand-text">Energy Analytics</span></div>',
+        unsafe_allow_html=True
+    )
     if company:
         st.markdown(f"**{company.get('company_name', '')}**")
         st.caption(f"{company.get('sector', '')} · {company.get('country', '')}")
     st.divider()
-    if st.button("🔄 Atualizar Dados", use_container_width=True):
+    if st.button("Atualizar Dados", use_container_width=True):
         st.cache_data.clear()
         st.rerun()
     st.divider()
@@ -332,7 +391,10 @@ year_str  = parts[1] if len(parts) > 1 else ""
 
 st.markdown('<div class="page-title">Energy KPI Dashboard</div>', unsafe_allow_html=True)
 st.markdown('<div class="page-subtitle">Monitorização de consumo energético e sustentabilidade</div>', unsafe_allow_html=True)
-st.markdown(f'<div class="badge-report">📋 Último relatório · {latest_label}</div>', unsafe_allow_html=True)
+st.markdown(
+    f'<div class="badge-report">{ICON_REPORT} Último relatório &nbsp;·&nbsp; {latest_label}</div>',
+    unsafe_allow_html=True
+)
 
 
 # ── HERO KPIs ──────────────────────────────────────────────────────────────────
@@ -345,7 +407,10 @@ with col_a:
     if consumo is not None:
         st.markdown(f"""
         <div class="kpi-hero-consumo">
-            <div class="kpi-hero-kpi-name kpi-hero-kpi-name-consumo">⚡ Consumo Total</div>
+            <div class="kpi-icon-row">
+                <div class="kpi-icon-wrap-consumo">{ICON_ZAP}</div>
+                <span class="kpi-hero-kpi-name kpi-hero-kpi-name-consumo">Consumo Total</span>
+            </div>
             <div class="kpi-hero-month">
                 {month_str}<span class="kpi-hero-year kpi-hero-year-consumo">{year_str}</span>
             </div>
@@ -360,7 +425,10 @@ with col_b:
     if renovavel is not None:
         st.markdown(f"""
         <div class="kpi-hero-renov">
-            <div class="kpi-hero-kpi-name kpi-hero-kpi-name-renov">🌱 Energia Renovável</div>
+            <div class="kpi-icon-row">
+                <div class="kpi-icon-wrap-renov">{ICON_LEAF}</div>
+                <span class="kpi-hero-kpi-name kpi-hero-kpi-name-renov">Energia Renovável</span>
+            </div>
             <div class="kpi-hero-month">
                 {month_str}<span class="kpi-hero-year kpi-hero-year-renov">{year_str}</span>
             </div>
@@ -436,11 +504,8 @@ with chart_col2:
         ))
         fig2.update_layout(**PLOT_LAYOUT, height=280)
         fig2.update_yaxes(
-            range=[0, 100],
-            ticksuffix="%",
-            gridcolor="#f3f4f6",
-            linecolor="rgba(0,0,0,0)",
-            tickcolor="rgba(0,0,0,0)",
+            range=[0, 100], ticksuffix="%",
+            gridcolor="#f3f4f6", linecolor="rgba(0,0,0,0)", tickcolor="rgba(0,0,0,0)",
         )
         st.plotly_chart(fig2, use_container_width=True)
     else:
@@ -450,7 +515,7 @@ st.divider()
 
 
 # ── RAW DOCUMENTS ──────────────────────────────────────────────────────────────
-with st.expander("📄 Documentos Originais", expanded=False):
+with st.expander(f"Documentos Originais", expanded=False):
     if not df_raw.empty:
         categories = ["Todos"] + sorted(df_raw["category"].unique()) if "category" in df_raw.columns else ["Todos"]
         selected = st.selectbox("Filtrar por Categoria", categories, key="cat_filter")
@@ -459,5 +524,5 @@ with st.expander("📄 Documentos Originais", expanded=False):
     else:
         st.info("Sem documentos disponíveis.")
 
-with st.expander("📊 Todos os Valores KPI", expanded=False):
+with st.expander("Todos os Valores KPI", expanded=False):
     st.dataframe(df_kpi.sort_values(["report_id", "kpi_name"]), use_container_width=True, hide_index=True)
