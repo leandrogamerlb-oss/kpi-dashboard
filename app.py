@@ -1,7 +1,6 @@
 import streamlit as st
 import pymongo
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 import os
@@ -24,12 +23,16 @@ html, body, [class*="css"] {
     font-family: 'Syne', sans-serif;
 }
 
-.main { background-color: #060b16; }
+/* ── BACKGROUND ── */
+.main { background-color: #f4f6f9; }
 
 section[data-testid="stSidebar"] {
-    background-color: #09111f;
-    border-right: 1px solid rgba(255,255,255,0.05);
+    background-color: #1a1f2e;
+    border-right: none;
 }
+section[data-testid="stSidebar"] * { color: #c8d0e0 !important; }
+section[data-testid="stSidebar"] h3 { color: #ffffff !important; }
+section[data-testid="stSidebar"] strong { color: #ffffff !important; }
 
 .block-container { padding-top: 2rem; padding-bottom: 2rem; }
 
@@ -37,143 +40,137 @@ section[data-testid="stSidebar"] {
 .page-title {
     font-size: 2rem;
     font-weight: 800;
-    color: #ffffff;
+    color: #111827;
     letter-spacing: -0.02em;
     margin-bottom: 4px;
 }
 .page-subtitle {
     font-size: 0.85rem;
-    color: #3d5473;
+    color: #6b7280;
     font-weight: 400;
     margin-bottom: 20px;
 }
 
-/* ── KPI HERO ── */
-.kpi-hero {
-    background: linear-gradient(145deg, #0c1a35 0%, #0a2040 55%, #081830 100%);
-    border: 1px solid rgba(91,140,255,0.18);
-    border-radius: 20px;
-    padding: 30px 32px 28px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
-}
-.kpi-hero::before {
-    content: '';
-    position: absolute;
-    top: -80px; right: -80px;
-    width: 220px; height: 220px;
-    background: radial-gradient(circle, rgba(91,140,255,0.1) 0%, transparent 65%);
-    pointer-events: none;
-}
-.kpi-hero::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(91,140,255,0.15), transparent);
-}
-.kpi-hero-label {
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: #5B8CFF;
-    margin-bottom: 10px;
-    display: flex;
+/* ── BADGE ── */
+.badge-report {
+    display: inline-flex;
     align-items: center;
     gap: 6px;
+    background: #e8eaf6;
+    border: 1px solid #c5cae9;
+    color: #3949ab;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
 }
-/* Month — top, prominent */
-.kpi-hero-month {
-    font-size: 1.55rem;
+
+/* ── KPI HERO — CONSUMO (amber) ── */
+.kpi-hero-consumo {
+    background: linear-gradient(135deg, #fff8ed 0%, #fff3e0 100%);
+    border: 1.5px solid #fbc02d;
+    border-radius: 20px;
+    padding: 28px 32px 26px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(251,192,45,0.15);
+}
+.kpi-hero-consumo::before {
+    content: '';
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(255,193,7,0.18) 0%, transparent 65%);
+    pointer-events: none;
+}
+
+/* ── KPI HERO — RENOVAVEL (green) ── */
+.kpi-hero-renov {
+    background: linear-gradient(135deg, #f0fdf4 0%, #e6f7ee 100%);
+    border: 1.5px solid #34a853;
+    border-radius: 20px;
+    padding: 28px 32px 26px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(52,168,83,0.15);
+}
+.kpi-hero-renov::before {
+    content: '';
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(52,168,83,0.14) 0%, transparent 65%);
+    pointer-events: none;
+}
+
+/* ── SHARED CARD INTERNALS ── */
+.kpi-hero-kpi-name {
+    font-size: 1.1rem;
     font-weight: 800;
-    color: #ffffff;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+}
+.kpi-hero-kpi-name-consumo { color: #b45309; }
+.kpi-hero-kpi-name-renov   { color: #166534; }
+
+.kpi-hero-month {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: #111827;
+    letter-spacing: -0.02em;
     line-height: 1.1;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 .kpi-hero-year {
-    font-size: 1.55rem;
+    font-size: 1.7rem;
     font-weight: 400;
-    color: #5B8CFF;
-    margin-left: 8px;
-    letter-spacing: -0.01em;
+    margin-left: 10px;
 }
-/* Divider between month and value */
-.kpi-hero-divider {
-    height: 1px;
-    background: linear-gradient(90deg, rgba(91,140,255,0.25), transparent);
-    margin: 14px 0;
+.kpi-hero-year-consumo { color: #d97706; }
+.kpi-hero-year-renov   { color: #16a34a; }
+
+.kpi-hero-divider-consumo {
+    height: 2px;
+    background: linear-gradient(90deg, #fbc02d, transparent);
+    margin: 16px 0;
+    border-radius: 2px;
 }
-/* Value — bottom, secondary */
+.kpi-hero-divider-renov {
+    height: 2px;
+    background: linear-gradient(90deg, #34a853, transparent);
+    margin: 16px 0;
+    border-radius: 2px;
+}
+
 .kpi-hero-value {
-    font-size: 2.4rem;
-    font-weight: 700;
-    color: #a8c4ff;
+    font-size: 2.8rem;
+    font-weight: 800;
     line-height: 1;
     font-family: 'JetBrains Mono', monospace;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.04em;
+    color: #111827;
 }
 .kpi-hero-unit {
-    font-size: 0.95rem;
-    font-weight: 400;
-    color: #3d5a80;
+    font-size: 1rem;
+    font-weight: 500;
     margin-left: 6px;
     font-family: 'Syne', sans-serif;
     letter-spacing: 0;
 }
-
-/* ── METRIC CARD ── */
-.metric-card {
-    background: #0a1220;
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 16px;
-    padding: 22px 26px;
-    height: 100%;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.3);
-}
-.metric-card-label {
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #2e4a68;
-    margin-bottom: 10px;
-}
-.metric-card-value {
-    font-size: 1.9rem;
-    font-weight: 700;
-    color: #ffffff;
-    font-family: 'JetBrains Mono', monospace;
-    line-height: 1;
-    letter-spacing: -0.02em;
-}
-.metric-card-unit {
-    font-size: 0.85rem;
-    color: #3d5473;
-    margin-left: 4px;
-    font-family: 'Syne', sans-serif;
-}
-.metric-card-badge {
-    display: inline-block;
-    margin-top: 10px;
-    font-size: 0.68rem;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 20px;
-    background: rgba(0,194,168,0.1);
-    color: #00C2A8;
-    letter-spacing: 0.06em;
-}
+.kpi-hero-unit-consumo { color: #92400e; }
+.kpi-hero-unit-renov   { color: #166534; }
 
 /* ── SECTION HEADER ── */
 .section-header {
-    font-size: 0.68rem;
+    font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: #2e4a68;
+    color: #9ca3af;
     margin-bottom: 16px;
     margin-top: 8px;
     display: flex;
@@ -184,42 +181,25 @@ section[data-testid="stSidebar"] {
     content: '';
     flex: 1;
     height: 1px;
-    background: rgba(255,255,255,0.05);
+    background: #e5e7eb;
 }
 
-/* ── BADGE ── */
-.badge-report {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(91,140,255,0.08);
-    border: 1px solid rgba(91,140,255,0.15);
-    color: #5B8CFF;
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 5px 14px;
-    border-radius: 20px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 28px;
-}
-
-/* ── CHART CONTAINER ── */
+/* ── CHART TITLE ── */
 .chart-title {
     font-size: 0.75rem;
     font-weight: 700;
-    color: #4a6a8a;
+    color: #6b7280;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     margin-bottom: 4px;
 }
 
-hr { border-color: rgba(255,255,255,0.05) !important; }
+hr { border-color: #e5e7eb !important; }
 
-/* Streamlit overrides */
+/* Streamlit expander light theme */
 [data-testid="stExpander"] {
-    background: #0a1220;
-    border: 1px solid rgba(255,255,255,0.06) !important;
+    background: #ffffff;
+    border: 1px solid #e5e7eb !important;
     border-radius: 14px !important;
 }
 </style>
@@ -267,24 +247,23 @@ def load_company():
 PLOT_LAYOUT = dict(
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(family="Syne, sans-serif", color="#3d5473", size=11),
+    font=dict(family="Syne, sans-serif", color="#9ca3af", size=11),
     margin=dict(l=10, r=10, t=16, b=10),
     xaxis=dict(
         showgrid=False,
-        linecolor="rgba(255,255,255,0.04)",
+        linecolor="#e5e7eb",
         tickcolor="rgba(0,0,0,0)",
-        tickfont=dict(size=10, color="#3d5473"),
+        tickfont=dict(size=10, color="#6b7280"),
     ),
     yaxis=dict(
-        gridcolor="rgba(255,255,255,0.04)",
+        gridcolor="#f3f4f6",
         linecolor="rgba(0,0,0,0)",
         tickcolor="rgba(0,0,0,0)",
-        tickfont=dict(size=10, color="#3d5473"),
+        tickfont=dict(size=10, color="#6b7280"),
     ),
     showlegend=False,
 )
 
-# Portuguese month names
 PT_MONTHS = {
     1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril",
     5: "Maio", 6: "Junho", 7: "Julho", 8: "Agosto",
@@ -292,21 +271,14 @@ PT_MONTHS = {
 }
 
 def report_id_to_label(report_id: str) -> str:
-    """
-    Converts 'REP2026_06' → 'Junho 2026'.
-    Falls back gracefully if the format is unexpected.
-    """
     try:
-        clean = report_id.replace("REP", "")          # '2026_06'
+        clean = report_id.replace("REP", "")
         year_str, month_str = clean.split("_")
-        year = int(year_str)
-        month = int(month_str)
-        return f"{PT_MONTHS[month]} {year}"
+        return f"{PT_MONTHS[int(month_str)]} {int(year_str)}"
     except Exception:
-        return report_id  # safe fallback
+        return report_id
 
 def sort_reports(reports):
-    """Sort report IDs — tries to extract year+month numeric suffix."""
     def key(r):
         parts = r.replace("REP", "").split("_")
         try:
@@ -354,6 +326,9 @@ def get_kpi(df, name, default=None):
 
 # ── PAGE HEADER ────────────────────────────────────────────────────────────────
 latest_label = report_id_to_label(latest_report)
+parts = latest_label.split(" ", 1)
+month_str = parts[0]
+year_str  = parts[1] if len(parts) > 1 else ""
 
 st.markdown('<div class="page-title">Energy KPI Dashboard</div>', unsafe_allow_html=True)
 st.markdown('<div class="page-subtitle">Monitorização de consumo energético e sustentabilidade</div>', unsafe_allow_html=True)
@@ -361,37 +336,38 @@ st.markdown(f'<div class="badge-report">📋 Último relatório · {latest_label
 
 
 # ── HERO KPIs ──────────────────────────────────────────────────────────────────
-consumo, consumo_unit   = get_kpi(df_latest, "consumo_total")
-renovavel, renov_unit   = get_kpi(df_latest, "perc_energia_renovavel")
+consumo, consumo_unit = get_kpi(df_latest, "consumo_total")
+renovavel, renov_unit = get_kpi(df_latest, "perc_energia_renovavel")
 
 col_a, col_b, col_spacer = st.columns([1, 1, 1])
 
 with col_a:
     if consumo is not None:
-        # Split "Junho 2026" → month + year for styled rendering
-        parts = latest_label.split(" ", 1)
-        month_str = parts[0]
-        year_str = parts[1] if len(parts) > 1 else ""
         st.markdown(f"""
-        <div class="kpi-hero">
-            <div class="kpi-hero-label">⚡ Consumo Total</div>
-            <div class="kpi-hero-month">{month_str}<span class="kpi-hero-year">{year_str}</span></div>
-            <div class="kpi-hero-divider"></div>
-            <div class="kpi-hero-value">{consumo:,}<span class="kpi-hero-unit">{consumo_unit}</span></div>
+        <div class="kpi-hero-consumo">
+            <div class="kpi-hero-kpi-name kpi-hero-kpi-name-consumo">⚡ Consumo Total</div>
+            <div class="kpi-hero-month">
+                {month_str}<span class="kpi-hero-year kpi-hero-year-consumo">{year_str}</span>
+            </div>
+            <div class="kpi-hero-divider-consumo"></div>
+            <div class="kpi-hero-value">
+                {consumo:,}<span class="kpi-hero-unit kpi-hero-unit-consumo">{consumo_unit}</span>
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
 with col_b:
     if renovavel is not None:
-        parts = latest_label.split(" ", 1)
-        month_str = parts[0]
-        year_str = parts[1] if len(parts) > 1 else ""
         st.markdown(f"""
-        <div class="kpi-hero">
-            <div class="kpi-hero-label">🌱 Energia Renovável</div>
-            <div class="kpi-hero-month">{month_str}<span class="kpi-hero-year">{year_str}</span></div>
-            <div class="kpi-hero-divider"></div>
-            <div class="kpi-hero-value">{renovavel}<span class="kpi-hero-unit">{renov_unit}</span></div>
+        <div class="kpi-hero-renov">
+            <div class="kpi-hero-kpi-name kpi-hero-kpi-name-renov">🌱 Energia Renovável</div>
+            <div class="kpi-hero-month">
+                {month_str}<span class="kpi-hero-year kpi-hero-year-renov">{year_str}</span>
+            </div>
+            <div class="kpi-hero-divider-renov"></div>
+            <div class="kpi-hero-value">
+                {renovavel}<span class="kpi-hero-unit kpi-hero-unit-renov">{renov_unit}</span>
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -403,14 +379,11 @@ st.markdown('<div class="section-header">Evolução ao Longo do Tempo</div>', un
 
 chart_col1, chart_col2 = st.columns(2)
 
-# ── Consumo total per report (bar) ──
 with chart_col1:
     st.markdown('<div class="chart-title">Consumo Total por Relatório</div>', unsafe_allow_html=True)
-
     df_consumo_all = (
         df_kpi[df_kpi["kpi_name"] == "consumo_total"]
-        .groupby("report_id", as_index=False)["value"]
-        .mean()          # aggregate duplicates
+        .groupby("report_id", as_index=False)["value"].mean()
     )
     df_consumo_all["report_id"] = pd.Categorical(
         df_consumo_all["report_id"], categories=all_reports, ordered=True
@@ -425,27 +398,23 @@ with chart_col1:
             y=df_consumo_all["value"],
             marker=dict(
                 color=df_consumo_all["report_id"].astype(str).apply(
-                    lambda r: "#5B8CFF" if r == latest_report else "#162340"
+                    lambda r: "#f59e0b" if r == latest_report else "#fde68a"
                 ),
                 line=dict(width=0),
                 cornerradius=6,
             ),
             hovertemplate="<b>%{x}</b><br>%{y:,} kWh<extra></extra>",
         ))
-        layout = dict(**PLOT_LAYOUT, height=280)
-        fig.update_layout(**layout)
+        fig.update_layout(**PLOT_LAYOUT, height=280)
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.info("Sem dados de consumo.")
 
-# ── Renovável per report (line) — aggregated to ONE point per report ──
 with chart_col2:
     st.markdown('<div class="chart-title">Energia Renovável % por Relatório</div>', unsafe_allow_html=True)
-
     df_renov_all = (
         df_kpi[df_kpi["kpi_name"] == "perc_energia_renovavel"]
-        .groupby("report_id", as_index=False)["value"]
-        .mean()          # ← FIX: one point per report, eliminates double dots
+        .groupby("report_id", as_index=False)["value"].mean()
     )
     df_renov_all["report_id"] = pd.Categorical(
         df_renov_all["report_id"], categories=all_reports, ordered=True
@@ -459,22 +428,17 @@ with chart_col2:
             x=df_renov_all["label"],
             y=df_renov_all["value"],
             mode="lines+markers",
-            line=dict(color="#00C2A8", width=2.5),
-            marker=dict(
-                size=8,
-                color="#00C2A8",
-                line=dict(color="#060b16", width=2),
-            ),
+            line=dict(color="#16a34a", width=2.5),
+            marker=dict(size=8, color="#16a34a", line=dict(color="#f0fdf4", width=2)),
             fill="tozeroy",
-            fillcolor="rgba(0,194,168,0.06)",
+            fillcolor="rgba(22,163,74,0.08)",
             hovertemplate="<b>%{x}</b><br>%{y:.1f}%<extra></extra>",
         ))
-        layout2 = dict(**PLOT_LAYOUT, height=280)
-        fig2.update_layout(**layout2)
+        fig2.update_layout(**PLOT_LAYOUT, height=280)
         fig2.update_yaxes(
             range=[0, 100],
             ticksuffix="%",
-            gridcolor="rgba(255,255,255,0.04)",
+            gridcolor="#f3f4f6",
             linecolor="rgba(0,0,0,0)",
             tickcolor="rgba(0,0,0,0)",
         )
